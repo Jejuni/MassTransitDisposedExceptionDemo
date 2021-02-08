@@ -21,7 +21,7 @@ namespace MassTransitDisposedExceptionDemo.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> Do()
         {
-            await _bus.Send(new MyFirstMessage(DateTimeOffset.Now)).ConfigureAwait(false);
+            await _bus.Send(new MyFirstMessage()).ConfigureAwait(false);
 
             return Ok();
         }

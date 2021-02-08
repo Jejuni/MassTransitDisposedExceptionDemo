@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using GreenPipes;
 using MassTransit;
 using MassTransitDisposedExceptionDemo.Messaging;
 
@@ -20,10 +16,7 @@ namespace MassTransitDisposedExceptionDemo
 
                 configurator.UsingRabbitMq((busRegistrationContext, rabbitMqConfig) =>
                 {
-                    rabbitMqConfig.UseDelayedExchangeMessageScheduler();
                     rabbitMqConfig.UseInMemoryOutbox();
-                    rabbitMqConfig.PrefetchCount = 16;
-                    rabbitMqConfig.UseMessageRetry(x => x.Exponential(4, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(1)));
 
                     rabbitMqConfig.ReceiveEndpoint("testapi", o =>
                     {
@@ -39,9 +32,8 @@ namespace MassTransitDisposedExceptionDemo
 
             services.AddMassTransitHostedService();
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        
+        public void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
 
