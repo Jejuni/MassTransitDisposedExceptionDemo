@@ -1,3 +1,4 @@
+using GreenPipes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using MassTransit;
@@ -16,17 +17,20 @@ namespace MassTransitDisposedExceptionDemo
 
                 configurator.UsingRabbitMq((busRegistrationContext, rabbitMqConfig) =>
                 {
+                    rabbitMqConfig.UseMessageRetry(x => x.Immediate(2));
+                    rabbitMqConfig.UseMessageScope(busRegistrationContext);
                     rabbitMqConfig.UseInMemoryOutbox();
-
+                    
                     rabbitMqConfig.ReceiveEndpoint("testapi", o =>
                     {
-                        o.ConfigureConsumer<MySecondMessageHandler>(busRegistrationContext);
+                        //o.UseMessageRetry(x => x.Immediate(2));
+                        //o.UseMessageScope(busRegistrationContext);
+                        //o.UseInMemoryOutbox();
+                        
                         o.ConfigureConsumer<MyFirstMessageHandler>(busRegistrationContext);
-                        EndpointConvention.Map<MySecondMessage>(o.InputAddress);
+                        o.ConfigureConsumer<MyFaulHandler>(busRegistrationContext);
                         EndpointConvention.Map<MyFirstMessage>(o.InputAddress);
                     });
-
-                    rabbitMqConfig.UseSendFilter(typeof(MySendFilter<>), busRegistrationContext);
                 });
             });
 

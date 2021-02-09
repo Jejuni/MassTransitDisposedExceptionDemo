@@ -5,20 +5,17 @@ using MassTransit;
 namespace MassTransitDisposedExceptionDemo.Messaging
 {
     public class MyFirstMessage { }
-
-    public class MySecondMessage { }
-
-
+    
     public class MyFirstMessageHandler: IConsumer<MyFirstMessage>
     {
-        public Task Consume(ConsumeContext<MyFirstMessage> context) => context.Send(new MySecondMessage());
+        public Task Consume(ConsumeContext<MyFirstMessage> context) => throw new InvalidOperationException();
     }
-
-    public class MySecondMessageHandler : IConsumer<MySecondMessage>
+    
+    public class MyFaulHandler : IConsumer<Fault<MyFirstMessage>>
     {
-        public Task Consume(ConsumeContext<MySecondMessage> context)
+        public Task Consume(ConsumeContext<Fault<MyFirstMessage>> context)
         {
-            Console.WriteLine("Works!");
+            Console.WriteLine("Got Fault!");
             return Task.CompletedTask;
         }
     }
